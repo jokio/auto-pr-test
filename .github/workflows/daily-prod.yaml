@@ -2,7 +2,7 @@ name: Daily Production PR
 
 on:
   schedule:
-    # 6 PM PST / 7 PM PDT (cron is UTC; shifts by 1h across DST)
+    #  6 PM PST / 7 PM PDT (cron is UTC; shifts by 1h across DST)
     - cron: "0 2 * * *"
   workflow_dispatch:
 
@@ -45,11 +45,17 @@ jobs:
     needs: [check-diff]
     if: needs.check-diff.outputs.has_changes == 'true'
     steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
       - uses: actions/checkout@v5
         with:
           ref: ${{ needs.check-diff.outputs.dev_sha }}
           fetch-depth: 0
-          token: ${{ secrets.RELEASE_BOT_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
       - name: Create release branch from tested dev commit
         id: branch
         env:
@@ -75,7 +81,7 @@ jobs:
       - name: Create or update PR
         id: pr
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           BRANCH="${{ steps.branch.outputs.branch }}"
           DATE="${{ steps.branch.outputs.date }}"
@@ -101,6 +107,6 @@ jobs:
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
       - name: Enable auto-merge
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           gh pr merge ${{ steps.pr.outputs.pr_number }} --merge || gh pr merge ${{ steps.pr.outputs.pr_number }} --merge --auto
