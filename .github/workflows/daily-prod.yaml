@@ -2,7 +2,7 @@ name: Daily Production PR
 
 on:
   schedule:
-    # 6 PM PST / 7 PM PDT (cron is UTC; shifts by 1h across DST)
+    #  6 PM PST / 7 PM PDT (cron is UTC; shifts by 1h across DST)
     - cron: "0 2 * * *"
   workflow_dispatch:
 
