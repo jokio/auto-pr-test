@@ -109,4 +109,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr merge ${{ steps.pr.outputs.pr_number }} --auto
+          gh pr merge ${{ steps.pr.outputs.pr_number }} --merge --auto
