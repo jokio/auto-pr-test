@@ -55,7 +55,7 @@ jobs:
         with:
           ref: ${{ needs.check-diff.outputs.dev_sha }}
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_BOT_TOKEN }}
       - name: Create release branch from tested dev commit
         id: branch
         env:
@@ -81,7 +81,7 @@ jobs:
       - name: Create or update PR
         id: pr
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
         run: |
           BRANCH="${{ steps.branch.outputs.branch }}"
           DATE="${{ steps.branch.outputs.date }}"
@@ -105,8 +105,8 @@ jobs:
           fi
 
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-      # - name: Enable auto-merge
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     gh pr merge ${{ steps.pr.outputs.pr_number }} --merge || gh pr merge ${{ steps.pr.outputs.pr_number }} --merge --auto
+      - name: Enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
+        run: |
+          gh pr merge ${{ steps.pr.outputs.pr_number }} --merge || gh pr merge ${{ steps.pr.outputs.pr_number }} --merge --auto
