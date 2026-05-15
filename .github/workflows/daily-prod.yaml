@@ -45,12 +45,6 @@ jobs:
     needs: [check-diff]
     if: needs.check-diff.outputs.has_changes == 'true'
     steps:
-      # - name: Generate GitHub App token
-      #   id: app-token
-      #   uses: actions/create-github-app-token@v2
-      #   with:
-      #     app-id: ${{ vars.RELEASE_APP_ID }}
-      #     private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
       - uses: actions/checkout@v5
         with:
           ref: ${{ needs.check-diff.outputs.dev_sha }}
