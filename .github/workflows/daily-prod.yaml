@@ -45,17 +45,17 @@ jobs:
     needs: [check-diff]
     if: needs.check-diff.outputs.has_changes == 'true'
     steps:
-      - name: Generate GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ vars.RELEASE_APP_ID }}
-          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+      # - name: Generate GitHub App token
+      #   id: app-token
+      #   uses: actions/create-github-app-token@v2
+      #   with:
+      #     app-id: ${{ vars.RELEASE_APP_ID }}
+      #     private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
       - uses: actions/checkout@v5
         with:
           ref: ${{ needs.check-diff.outputs.dev_sha }}
           fetch-depth: 0
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create release branch from tested dev commit
         id: branch
         env:
@@ -81,7 +81,7 @@ jobs:
       - name: Create or update PR
         id: pr
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BRANCH="${{ steps.branch.outputs.branch }}"
           DATE="${{ steps.branch.outputs.date }}"
